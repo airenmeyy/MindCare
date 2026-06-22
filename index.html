@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MindCare</title>
+<title>MindCare - Mental Health Support ITS</title>
 <meta name="description" content="Platform penjadwalan sesi pendampingan mental health yang aman, rahasia, dan profesional">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -117,7 +117,7 @@ body::before {
    ============================================================ */
 .top-nav {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 52px;
+  margin-bottom: 24px;
   animation: fadeDown 0.5s ease both;
 }
 
@@ -135,11 +135,23 @@ body::before {
 }
 [data-theme="dark"] .logo-text { color: var(--ink-900); }
 
-
-
 /* ============================================================
-   HEADER
+   HEADER & BANNER
    ============================================================ */
+#admin-announcement {
+  display: none; 
+  background: var(--amber); 
+  color: white; 
+  padding: 12px 20px; 
+  border-radius: var(--r-md); 
+  margin-bottom: 24px; 
+  font-size: 13.5px; 
+  font-weight: 500; 
+  text-align: center; 
+  box-shadow: var(--shadow-card); 
+  animation: fadeDown 0.5s ease both;
+}
+
 .hero {
   text-align: center; margin-bottom: 44px;
   animation: fadeDown 0.5s 0.08s ease both;
@@ -483,6 +495,11 @@ input.invalid, select.invalid, textarea.invalid {
     </div>
   </nav>
 
+  <!-- ADMIN ANNOUNCEMENT BANNER (Dinamis dari Backend) -->
+  <div id="admin-announcement">
+    <strong>Pemberitahuan:</strong> <span id="announcement-text"></span>
+  </div>
+
   <!-- HERO -->
   <header class="hero">
     <h1>Ruang aman untuk <em>bercerita</em></h1>
@@ -542,7 +559,7 @@ input.invalid, select.invalid, textarea.invalid {
       </div>
       <div class="row-2">
         <div class="field">
-          <label class="lbl" for="f-email">Email ITS <span class="req">*</span> 
+          <label class="lbl" for="f-email">Email ITS <span class="req">*</span></label>
           <input type="email" id="f-email" placeholder="5025XXXXXX@student.its.ac.id">
           <div class="field-err" id="e-email"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Gunakan email ITS: nrp@student.its.ac.id</div>
         </div>
@@ -714,13 +731,11 @@ input.invalid, select.invalid, textarea.invalid {
 
 // =====================================================
 // CONFIG
-// Ganti APPS_SCRIPT_URL dengan URL deploy Apps Script Anda.
-// Format email wajib: <nrp>@student.its.ac.id
+// Ganti nilai konstanta ini dengan URL Apps Script terbaru Anda
 // =====================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzj1LsMhWycWO6b8laGiKYiwD-CQaUEczSg7q5EH21DVMic8uPT-fItqebbUMFGBvZ6NQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzF1L7gZVlbs4vPjbq9vP2GyHTzwVlr1HN6tIBZcy2sk1ZkwSV8YrqFvDpQ_4WSPr5RCg/exec';
 
 // Regex validasi email ITS: NRP@student.its.ac.id
-// NRP berformat angka (minimal 8 digit)
 const ITS_EMAIL_REGEX = /^\d{10,}@student\.its\.ac\.id$/i;
 
 // =====================================================
@@ -778,15 +793,22 @@ async function refreshSlotsOnly() {
   const slotGrid  = document.getElementById('slot-grid');
   if (!dateInput.value || !slotGrid.innerHTML) return;
 
-  // Tampilkan indikator refresh halus di badge
-  const badges = slotGrid.querySelectorAll('.slot-badge:not(.slot-opt.booked .slot-badge)');
-
   let bookedSlots = [];
   try {
-    if (!APPS_SCRIPT_URL.includes('AKfycb...')) {
+    if (APPS_SCRIPT_URL) {
       const res  = await fetch(`${APPS_SCRIPT_URL}?action=getSlots&date=${dateInput.value}&t=${Date.now()}`);
       const data = await res.json();
       if (Array.isArray(data.bookedSlots)) bookedSlots = data.bookedSlots;
+      
+      // LOGIKA BANNER ADMIN
+      const banner = document.getElementById('admin-announcement');
+      const bannerText = document.getElementById('announcement-text');
+      if (data.announcement && data.announcement.trim() !== "") {
+        bannerText.textContent = data.announcement;
+        banner.style.display = 'block';
+      } else {
+        banner.style.display = 'none';
+      }
     }
   } catch (e) { return; } // Abaikan error polling, jangan ganggu UX
 
@@ -842,13 +864,23 @@ async function validateDateAndLoadSlots() {
 
   let bookedSlots = [];
   try {
-    if (!APPS_SCRIPT_URL.includes('AKfycb...')) {
+    if (APPS_SCRIPT_URL) {
       const res  = await fetch(`${APPS_SCRIPT_URL}?action=getSlots&date=${dateInput.value}&t=${Date.now()}`);
       const data = await res.json();
       if (Array.isArray(data.bookedSlots)) bookedSlots = data.bookedSlots;
+
+      // LOGIKA BANNER ADMIN
+      const banner = document.getElementById('admin-announcement');
+      const bannerText = document.getElementById('announcement-text');
+      if (data.announcement && data.announcement.trim() !== "") {
+        bannerText.textContent = data.announcement;
+        banner.style.display = 'block';
+      } else {
+        banner.style.display = 'none';
+      }
     }
   } catch (e) {
-    console.warn('Apps Script belum tersambung, menggunakan data lokal.');
+    console.warn('Apps Script belum tersambung atau error, menggunakan data lokal.');
   }
 
   slotGrid.innerHTML = '';
@@ -982,9 +1014,7 @@ async function submitForm() {
   stopSlotPolling(); // Hentikan polling saat submit dimulai
 
   // ── LAYER 1: Cek ketersediaan slot SEBELUM kirim ke server ──
-  // Re-fetch data terbaru untuk deteksi jika slot sudah diambil
-  // sejak user memilih (window of vulnerability)
-  if (!APPS_SCRIPT_URL.includes('AKfycb...')) {
+  if (APPS_SCRIPT_URL) {
     try {
       const checkRes  = await fetch(`${APPS_SCRIPT_URL}?action=getSlots&date=${tanggal}&t=${Date.now()}`);
       const checkData = await checkRes.json();
@@ -1019,7 +1049,7 @@ async function submitForm() {
   };
 
   try {
-    // ── LAYER 2: Server-side LockService + re-check di code.gs ──
+    // ── LAYER 2: Server-side LockService (diproses di Google Apps Script) ──
     const res  = await fetch(APPS_SCRIPT_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
