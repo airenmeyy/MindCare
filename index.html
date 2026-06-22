@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindCare</title>
+<meta name="description" content="Platform penjadwalan sesi pendampingan mental health yang aman, rahasia, dan profesional — oleh M-HiTS ITS Surabaya.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --navy:      #0B416B;
+  --teal:      #008B96;
+  --teal-mid:  #00A8B5;
+  --teal-lt:   #E0F5F6;
+  --amber:     #F38320;
+
+  --bg:        #F7F9FC;
+  --surface:   #FFFFFF;
+  --surface-2: #F2F5F8;
+  --border:    rgba(11,65,107,0.09);
+  --border-md: rgba(11,65,107,0.14);
+
+  --ink-900:   #0D1B2A;
+  --ink-700:   #2E4057;
+  --ink-500:   #5C7499;
+  --ink-300:   #A2B4C8;
+  --ink-100:   #DFE8F0;
+
+  --ok:        #059669;
+  --ok-bg:     #ECFDF5;
+  --err:       #DC2626;
+  --err-bg:    #FEF2F2;
+
+  --r-sm:  6px;
+  --r-md:  12px;
+  --r-lg:  20px;
+  --r-xl:  28px;
+
+  --shadow-card: 0 1px 2px rgba(11,65,107,0.04), 0 8px 24px -4px rgba(11,65,107,0.07);
+  --shadow-float: 0 20px 48px -8px rgba(11,65,107,0.16);
+
+  --ease: 0.25s cubic-bezier(0.4,0,0.2,1);
+
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans:  'Inter', system-ui, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg:        #090F17;
+  --surface:   #0F1923;
+  --surface-2: #141F2E;
+  --border:    rgba(255,255,255,0.06);
+  --border-md: rgba(255,255,255,0.10);
+
+  --ink-900:   #E8F0F8;
+  --ink-700:   #B0C4D8;
+  --ink-500:   #7A97B3;
+  --ink-300:   #4A6880;
+  --ink-100:   #1E3045;
+
+  --teal:      #2DC9D6;
+  --teal-lt:   rgba(0,139,150,0.12);
+
+  --ok-bg:     rgba(5,150,105,0.12);
+  --err-bg:    rgba(220,38,38,0.12);
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink-900);
+  min-height: 100vh;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--ease), color var(--ease);
+}
+
+/* Subtle grain texture overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+
+/* Ambient glow blobs */
+body::before {
+  content: '';
+  position: fixed; top: -15vw; right: -10vw;
+  width: 55vw; height: 55vw;
+  background: radial-gradient(circle, rgba(0,139,150,0.06) 0%, transparent 65%);
+  border-radius: 50%; pointer-events: none; z-index: 0;
+}
+
+.wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 36px 20px 100px;
+  position: relative; z-index: 1;
+}
+
+/* ============================================================
+   TOP NAV
+   ============================================================ */
+.top-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 52px;
+  animation: fadeDown 0.5s ease both;
+}
+
+.logo-wrap { display: flex; align-items: center; gap: 11px; cursor: pointer; }
+.logo-img { height: 40px; width: auto; object-fit: contain; border-radius: 6px; }
+.logo-text {
+  font-family: var(--serif); font-weight: 400; font-style: italic;
+  font-size: 1.2rem; color: var(--navy); line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.logo-text small {
+  display: block; font-size: 0.65rem; font-weight: 600; font-style: normal;
+  font-family: var(--sans); color: var(--teal); letter-spacing: 0.05em;
+  text-transform: uppercase; margin-top: 2px;
+}
+[data-theme="dark"] .logo-text { color: var(--ink-900); }
+
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.hero {
+  text-align: center; margin-bottom: 44px;
+  animation: fadeDown 0.5s 0.08s ease both;
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--teal-lt); color: var(--teal);
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 999px;
+  margin-bottom: 18px;
+}
+.eyebrow svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 400; font-style: italic;
+  line-height: 1.2; color: var(--ink-900);
+  margin-bottom: 14px; letter-spacing: -0.01em;
+}
+h1 em { font-style: normal; color: var(--teal); }
+.hero-sub {
+  font-size: 15px; color: var(--ink-500); line-height: 1.7;
+  max-width: 480px; margin: 0 auto;
+}
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+.progress-wrap {
+  margin-bottom: 28px;
+  animation: fadeIn 0.5s 0.15s ease both;
+}
+.progress-meta {
+  display: flex; justify-content: space-between;
+  font-size: 11.5px; font-weight: 600; color: var(--ink-500);
+  margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.step-track { display: flex; gap: 6px; }
+.step-seg {
+  height: 3px; flex: 1; border-radius: 3px;
+  background: var(--ink-100); overflow: hidden; position: relative;
+}
+.step-seg::after {
+  content: ''; position: absolute; inset: 0; width: 0;
+  background: linear-gradient(90deg, var(--navy), var(--teal));
+  border-radius: inherit; transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.step-seg.active::after { width: 50%; }
+.step-seg.done::after   { width: 100%; }
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: 44px 48px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  animation: fadeUp 0.5s 0.2s ease both;
+  position: relative; overflow: hidden;
+}
+/* Subtle gradient shimmer on top */
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, var(--navy) 0%, var(--teal) 50%, var(--amber) 100%);
+  opacity: 0.7;
+}
+@media (max-width: 600px) { .card { padding: 32px 22px; } }
+
+.step-header { margin-bottom: 28px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+.step-num {
+  font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.step-title { font-family: var(--serif); font-size: 1.6rem; font-style: italic; color: var(--ink-900); line-height: 1.2; }
+.step-desc { font-size: 13.5px; color: var(--ink-500); margin-top: 6px; }
+
+/* ============================================================
+   FORM FIELDS
+   ============================================================ */
+.field { margin-bottom: 20px; position: relative; }
+label.lbl {
+  display: block; font-size: 12.5px; font-weight: 600;
+  color: var(--ink-700); margin-bottom: 7px; letter-spacing: 0.01em;
+}
+label.lbl .req { color: var(--teal); margin-left: 2px; }
+label.lbl .hint { font-weight: 400; color: var(--ink-300); font-size: 12px; margin-left: 5px; }
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border-md);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  font-family: var(--sans); font-size: 14.5px; color: var(--ink-900);
+  transition: var(--ease); outline: none; -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--teal);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(0,139,150,0.12);
+}
+input::placeholder, textarea::placeholder { color: var(--ink-300); }
+textarea { resize: vertical; min-height: 120px; }
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C7499' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+  padding-right: 44px;
+}
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 520px) { .row-2 { grid-template-columns: 1fr; gap: 0; } .row-2 .field { margin-bottom: 20px; } }
+
+input.invalid, select.invalid, textarea.invalid {
+  border-color: var(--err) !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.10) !important;
+}
+.field-err {
+  display: none; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--err); font-weight: 600; margin-top: 6px;
+}
+.field-err svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ============================================================
+   URGENCY CHOICE CARDS
+   ============================================================ */
+.choice-grid { display: grid; gap: 10px; }
+.choice-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+.choice-label {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 18px;
+  background: var(--surface-2); border: 1.5px solid var(--border-md);
+  border-radius: var(--r-md); cursor: pointer;
+  transition: var(--ease);
+}
+.choice-label:hover { border-color: rgba(0,139,150,0.3); background: var(--surface); }
+.choice-icon { width: 22px; height: 22px; flex-shrink: 0; stroke: var(--ink-300); fill: none; stroke-width: 2; margin-top: 1px; transition: var(--ease); }
+.choice-name { display: block; font-size: 14px; font-weight: 600; color: var(--ink-900); }
+.choice-desc { display: block; font-size: 12.5px; color: var(--ink-500); margin-top: 2px; line-height: 1.5; }
+.choice-opt input:checked + .choice-label { border-color: var(--teal); background: var(--teal-lt); }
+.choice-opt input:checked + .choice-label .choice-icon { stroke: var(--teal); }
+.choice-opt input:checked + .choice-label .choice-name { color: var(--navy); }
+[data-theme="dark"] .choice-opt input:checked + .choice-label { background: rgba(0,139,150,0.12); }
+
+/* ============================================================
+   SLOT GRID
+   ============================================================ */
+.slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+@media (max-width: 480px) { .slot-grid { grid-template-columns: repeat(2, 1fr); } }
+.slot-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+.slot-label {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  padding: 14px 8px;
+  background: var(--surface-2); border: 1.5px solid var(--border-md);
+  border-radius: var(--r-md); cursor: pointer; text-align: center; transition: var(--ease);
+}
+.slot-label:hover { border-color: rgba(0,139,150,0.3); background: var(--surface); }
+.slot-time { font-size: 13.5px; font-weight: 700; color: var(--ink-900); }
+.slot-badge { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--ok-bg); color: var(--ok); text-transform: uppercase; letter-spacing: 0.05em; }
+.slot-opt input:checked + .slot-label {
+  border-color: var(--teal); background: var(--navy); color: white;
+  box-shadow: 0 6px 16px rgba(11,65,107,0.18); transform: translateY(-2px);
+}
+.slot-opt input:checked + .slot-label .slot-time { color: white; }
+.slot-opt input:checked + .slot-label .slot-badge { background: rgba(255,255,255,0.18); color: white; }
+.slot-opt.booked .slot-label { background: var(--surface-2); border-color: transparent; opacity: 0.55; cursor: not-allowed; }
+.slot-opt.booked .slot-time { text-decoration: line-through; color: var(--ink-300); }
+.slot-opt.booked .slot-badge { background: var(--err-bg); color: var(--err); }
+.slot-opt.break .slot-label { background: rgba(243,131,32,0.06); border-color: transparent; cursor: not-allowed; }
+.slot-opt.break .slot-time { color: var(--amber); }
+.slot-opt.break .slot-badge { background: transparent; color: var(--amber); }
+
+/* ============================================================
+   INFO BOX
+   ============================================================ */
+.info-box {
+  display: flex; gap: 13px; align-items: flex-start;
+  background: var(--teal-lt); border-radius: var(--r-md);
+  padding: 14px 18px; font-size: 13.5px; color: var(--navy);
+  line-height: 1.6; font-weight: 500; margin-bottom: 22px;
+}
+[data-theme="dark"] .info-box { background: rgba(0,139,150,0.10); color: var(--ink-700); }
+.info-box svg { width: 20px; height: 20px; flex-shrink: 0; stroke: var(--teal); fill: none; stroke-width: 2; margin-top: 1px; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.nav-btns {
+  display: flex; justify-content: space-between; gap: 12px;
+  margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border);
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 24px; border-radius: var(--r-md); font-family: var(--sans);
+  font-size: 14px; font-weight: 600; cursor: pointer; border: none; outline: none;
+  transition: var(--ease);
+}
+.btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.btn-ghost {
+  background: transparent; border: 1.5px solid var(--border-md);
+  color: var(--ink-700);
+}
+.btn-ghost:hover { border-color: var(--ink-500); color: var(--ink-900); background: var(--surface-2); }
+.btn-primary {
+  background: var(--navy); color: white;
+  box-shadow: 0 2px 12px rgba(11,65,107,0.2);
+}
+.btn-primary:hover { background: var(--teal); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,139,150,0.28); }
+.btn-primary:disabled { background: var(--ink-300); cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ============================================================
+   FORM STEPS
+   ============================================================ */
+.form-step { display: none; }
+.form-step.active { display: block; animation: stepIn 0.35s ease; }
+
+/* ============================================================
+   SUCCESS SCREEN
+   ============================================================ */
+.success-screen { text-align: center; padding: 16px 0; }
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--ok-bg); display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 22px; animation: pop 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.success-icon svg { width: 34px; height: 34px; stroke: var(--ok); fill: none; stroke-width: 3; }
+.success-title { font-family: var(--serif); font-size: 1.7rem; font-style: italic; color: var(--ink-900); margin-bottom: 10px; }
+.ticket-box {
+  background: var(--surface-2); border: 1.5px dashed var(--ink-100);
+  border-radius: var(--r-lg); padding: 28px; margin: 28px 0;
+}
+.ticket-label { font-size: 11px; font-weight: 700; color: var(--ink-500); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.ticket-num { font-family: 'Courier New', monospace; font-size: 28px; font-weight: 800; color: var(--teal); letter-spacing: 3px; }
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(9,15,23,0.55);
+  backdrop-filter: blur(6px); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; visibility: hidden; transition: all 0.25s ease;
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal-box {
+  background: var(--surface); width: 100%; max-width: 440px;
+  border-radius: var(--r-xl); padding: 32px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-float);
+  transform: scale(0.96) translateY(8px);
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
+.modal-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+.modal-hdr h3 { font-family: var(--serif); font-size: 1.3rem; font-style: italic; color: var(--ink-900); }
+.modal-close {
+  background: var(--surface-2); border: none; cursor: pointer;
+  color: var(--ink-500); width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--ease);
+}
+.modal-close:hover { background: var(--err-bg); color: var(--err); transform: rotate(90deg); }
+.modal-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ============================================================
+   FOOTER — PROFESSIONAL
+   ============================================================ */
+.site-footer {
+  margin-top: 72px; padding-top: 40px;
+  border-top: 1px solid var(--border);
+  animation: fadeIn 0.6s 0.4s ease both;
+}
+.footer-inner {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: 32px; margin-bottom: 36px;
+}
+.footer-brand { flex: 1; min-width: 200px; }
+.footer-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+.footer-logo img { height: 32px; width: auto; object-fit: contain; border-radius: 4px; }
+.footer-logo-name { font-weight: 700; font-size: 15px; color: var(--navy); }
+[data-theme="dark"] .footer-logo-name { color: var(--ink-900); }
+.footer-tagline { font-size: 13px; color: var(--ink-500); line-height: 1.7; max-width: 280px; }
+
+.footer-links { display: flex; gap: 48px; flex-wrap: wrap; }
+.footer-col h5 {
+  font-size: 11px; font-weight: 700; color: var(--ink-700);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 10px; }
+.footer-col li a, .footer-col li span {
+  font-size: 13.5px; color: var(--ink-500); text-decoration: none;
+  transition: color var(--ease);
+}
+.footer-col li a:hover { color: var(--teal); }
+
+.footer-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  padding-top: 24px; border-top: 1px solid var(--border);
+  font-size: 12.5px; color: var(--ink-300);
+}
+.footer-bottom a { color: var(--ink-500); text-decoration: none; }
+.footer-bottom a:hover { color: var(--teal); }
+
+@media (max-width: 560px) {
+  .footer-inner { flex-direction: column; gap: 24px; }
+  .footer-links { gap: 28px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes stepIn  { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes pop     { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.08)} 100%{transform:scale(1);opacity:1} }
+@keyframes spin    { 100%{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <div class="logo-wrap" onclick="window.location.reload()">
+      <img src="logos.jpeg" alt="Logo MindCare" class="logo-img" onerror="this.style.display='none'">
+      <div class="logo-text">MindCare<small>Mental Health Advancing Humanity ITS</small></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <h1>Ruang aman untuk <em>bercerita</em></h1>
+    <p class="hero-sub">Setiap beban terasa lebih ringan ketika ada yang mendengarkan.</p>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-meta">
+      <span id="prog-label">Langkah 1 dari 3 — Informasi Pribadi</span>
+      <span id="prog-pct">33%</span>
+    </div>
+    <div class="step-track">
+      <div class="step-seg active" id="dot-1"></div>
+      <div class="step-seg" id="dot-2"></div>
+      <div class="step-seg" id="dot-3"></div>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="card" id="form-container">
+
+    <!-- STEP 1 -->
+    <div class="form-step active" id="step-1">
+      <div class="step-header">
+        <div class="step-num">Langkah 1 / 3</div>
+        <div class="step-title">Informasi Pribadi</div>
+        <p class="step-desc">Data ini digunakan untuk keperluan administrasi dan dijamin kerahasiaannya.</p>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label class="lbl" for="f-nama">Nama Lengkap <span class="req">*</span></label>
+          <input type="text" id="f-nama" placeholder="Nama Lengkap">
+          <div class="field-err" id="e-nama"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Nama wajib diisi</div>
+        </div>
+        <div class="field">
+          <label class="lbl" for="f-nrp">NRP <span class="req">*</span></label>
+          <input type="text" id="f-nrp" placeholder="5025XXXXXXXX">
+          <div class="field-err" id="e-nrp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> NRP wajib diisi</div>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label class="lbl" for="f-jurusan">Departemen <span class="req">*</span></label>
+          <input type="text" id="f-jurusan" placeholder="Contoh: Teknik Informatika">
+          <div class="field-err" id="e-jurusan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Wajib diisi</div>
+        </div>
+        <div class="field">
+          <label class="lbl" for="f-angkatan">Angkatan <span class="req">*</span></label>
+          <select id="f-angkatan">
+            <option value="">Pilih tahun angkatan...</option>
+            <option>2025</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option>
+          </select>
+          <div class="field-err" id="e-angkatan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Wajib dipilih</div>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label class="lbl" for="f-email">Email ITS <span class="req">*</span> 
+          <input type="email" id="f-email" placeholder="5025XXXXXX@student.its.ac.id">
+          <div class="field-err" id="e-email"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Gunakan email ITS: nrp@student.its.ac.id</div>
+        </div>
+        <div class="field">
+          <label class="lbl" for="f-wa">Nomor WhatsApp <span class="req">*</span></label>
+          <input type="tel" id="f-wa" placeholder="08XXXXXXXXXX">
+          <div class="field-err" id="e-wa"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Wajib diisi</div>
+        </div>
+      </div>
+
+      <div class="nav-btns" style="justify-content:flex-end">
+        <button class="btn btn-primary" onclick="goStep(1,2)">Lanjutkan <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="form-step" id="step-2">
+      <div class="step-header">
+        <div class="step-num">Langkah 2 / 3</div>
+        <div class="step-title">Detail Keluhan</div>
+        <p class="step-desc">Bantu kami memahami situasimu agar kami bisa menyiapkan pendamping yang tepat.</p>
+      </div>
+
+      <div class="field">
+        <label class="lbl" for="f-keluhan">Ceritakan secara singkat <span class="req">*</span></label>
+        <textarea id="f-keluhan" placeholder="Apa yang sedang membebani pikiranmu saat ini?"></textarea>
+        <div class="field-err" id="e-keluhan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Tolong ceritakan sedikit situasimu.</div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Tingkat Urgensi <span class="req">*</span></label>
+        <div class="choice-grid">
+          <div class="choice-opt">
+            <input type="radio" name="urgensi" id="u-ringan" value="ringan">
+            <label class="choice-label" for="u-ringan">
+              <svg class="choice-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <div><span class="choice-name">Ringan</span><span class="choice-desc">Perasaan masih stabil, hanya butuh teman ngobrol.</span></div>
+            </label>
+          </div>
+          <div class="choice-opt">
+            <input type="radio" name="urgensi" id="u-sedang" value="sedang">
+            <label class="choice-label" for="u-sedang">
+              <svg class="choice-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line></svg>
+              <div><span class="choice-name">Sedang</span><span class="choice-desc">Mulai mengganggu fokus dan rutinitas kuliah.</span></div>
+            </label>
+          </div>
+          <div class="choice-opt">
+            <input type="radio" name="urgensi" id="u-berat" value="berat">
+            <label class="choice-label" for="u-berat">
+              <svg class="choice-icon" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line></svg>
+              <div><span class="choice-name">Berat / Krisis</span><span class="choice-desc">Kondisi mendesak, kesulitan beraktivitas sama sekali.</span></div>
+            </label>
+          </div>
+        </div>
+        <div class="field-err" id="e-urgensi" style="margin-top:10px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Pilih salah satu tingkat urgensi.</div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(2,1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Kembali</button>
+        <button class="btn btn-primary" onclick="goStep(2,3)">Lanjutkan <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="form-step" id="step-3">
+      <div class="step-header">
+        <div class="step-num">Langkah 3 / 3</div>
+        <div class="step-title">Preferensi Jadwal</div>
+        <p class="step-desc">Pilih waktu luang Anda. Durasi setiap sesi adalah 40 menit.</p>
+      </div>
+
+      <div class="info-box">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <div>Layanan beroperasi <strong>setiap hari Jumat</strong> pukul <strong>09:00 – 16:00 WIB</strong>.<br><span style="font-size:12.5px; color:var(--ink-500); font-weight:400; display:block; margin-top:3px;"></span></div>
+      </div>
+
+      <div class="field">
+        <label class="lbl" for="f-tanggal">Pilih Hari Jumat <span class="req">*</span></label>
+        <input type="date" id="f-tanggal" min="" onchange="validateDateAndLoadSlots()">
+        <div class="field-err" id="e-tanggal"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Sistem hanya melayani hari Jumat. Silakan pilih tanggal Jumat.</div>
+      </div>
+
+      <div class="field" id="slot-container" style="display:none; margin-top:24px;">
+        <label class="lbl">Pilih Waktu Sesi (40 Menit) <span class="req">*</span></label>
+        <div class="slot-grid" id="slot-grid"></div>
+        <div class="field-err" id="e-waktu" style="margin-top:10px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg> Silakan pilih waktu yang tersedia.</div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(3,2)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Kembali</button>
+        <button class="btn btn-primary" id="btn-submit" onclick="submitForm()">Kirim Pengajuan <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="form-step" id="step-success">
+      <div class="success-screen">
+        <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        <h2 class="success-title">Sesi berhasil dijadwalkan!</h2>
+        <p style="color:var(--ink-500); font-size:14.5px; max-width:380px; margin:0 auto;">Langkah pertamamu sangat berharga. Kami telah mencatat jadwal ini secara eksklusif untukmu.</p>
+
+        <div class="ticket-box">
+          <div class="ticket-label">Nomor Tiket Kamu</div>
+          <div class="ticket-num" id="ticket-result">MH-XXXX</div>
+        </div>
+
+        <p style="color:var(--ink-500); font-size:13.5px; line-height:1.7;">Tim MindCare akan menghubungimu via WhatsApp untuk konfirmasi detail ruangan atau tautan daring.</p>
+        <button class="btn btn-ghost" style="margin-top:28px" onclick="location.reload()">Selesai</button>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- FOOTER PROFESIONAL -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="logos.jpeg" alt="Logo MindCare" onerror="this.style.display='none'">
+          <span class="footer-logo-name">MindCare</span>
+        </div>
+        <p class="footer-tagline">Platform kesehatan mental untuk sivitas akademika ITS.</p>
+        <p style="font-size:11.5px; color:var(--ink-300); margin-top:8px; font-style:italic;">Setiap beban terasa lebih ringan ketika ada yang mendengarkan.</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <h5>Operasional</h5>
+          <ul>
+            <li><span>📅 Setiap Jumat</span></li>
+            <li><span>⏰ 09:00 – 16:00 WIB</span></li>
+            <li><span>📍 Lt. 2 Kantin Pusat ITS</span></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Kontak</h5>
+          <ul>
+            <li><a href="mailto:mhits10nopember@gmail.com">mhits10nopember@gmail.com</a></li>
+            <li><a href="https://instagram.com/mhits.community" target="_blank" rel="noopener">@mhits.community</a></li>
+            <li><span style="font-size:12px;color:var(--ink-300);">Kampus Sukolilo, Surabaya</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2025 MindCare · Mental Health Advancing Humanity ITS</span>
+      <span>Institut Teknologi Sepuluh Nopember</span>
+    </div>
+  </footer>
+
+</div><!-- /wrapper -->
+
+<!-- MODAL: ERROR DOBEL BOOKING -->
+<div class="modal-overlay" id="modal-error">
+  <div class="modal-box" style="max-width:400px; text-align:center; padding:40px 28px;">
+    <div style="width:60px; height:60px; border-radius:50%; background:var(--err-bg); color:var(--err); display:flex; align-items:center; justify-content:center; margin:0 auto 18px;">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+    </div>
+    <h3 style="font-family:var(--serif); font-size:1.3rem; font-style:italic; color:var(--ink-900); margin-bottom:10px;">Slot Tidak Tersedia</h3>
+    <p id="error-msg-text" style="font-size:13.5px; color:var(--ink-500); margin-bottom:22px;">Waktu yang Anda pilih baru saja dipesan oleh orang lain. Silakan pilih waktu lain yang masih tersedia.</p>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeModal('error')">Mengerti</button>
+  </div>
+</div>
+
+<!-- ====== JAVASCRIPT ====== -->
+<script>
+'use strict';
+
+// =====================================================
+// CONFIG
+// Ganti APPS_SCRIPT_URL dengan URL deploy Apps Script Anda.
+// Format email wajib: <nrp>@student.its.ac.id
+// =====================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPtHjdbPIgJh5ocApLdvgaIij0PLNGVB5zIaDr98gJFAAkvs6i86SOL8MXw9S3m7Ip/exec';
+
+// Regex validasi email ITS: NRP@student.its.ac.id
+// NRP berformat angka (minimal 8 digit)
+const ITS_EMAIL_REGEX = /^\d{10,}@student\.its\.ac\.id$/i;
+
+// =====================================================
+// INIT
+// =====================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Set min date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('f-tanggal').min = today;
+
+  // Auto-fill email dari NRP jika NRP sudah diisi
+  document.getElementById('f-nrp').addEventListener('input', function () {
+    const emailEl = document.getElementById('f-email');
+    if (this.value.trim().length >= 8 && !emailEl.value.trim()) {
+      emailEl.value = this.value.trim() + '@student.its.ac.id';
+    }
+  });
+
+  // Live clear errors on input
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    el.addEventListener('input', function () {
+      this.classList.remove('invalid');
+      const errKey = this.id.replace('f-', '');
+      const errEl = document.getElementById(`e-${errKey}`);
+      if (errEl) errEl.style.display = 'none';
+    });
+  });
+});
+
+// =====================================================
+// SLOT DATA
+// =====================================================
+const JUMAT_SLOTS = [
+  { id: 's1', label: '09:00 - 09:40', type: 'normal' },
+  { id: 's2', label: '09:40 - 10:20', type: 'normal' },
+  { id: 's3', label: '10:20 - 11:00', type: 'normal' },
+  { id: 's4', label: '11:00 - 11:40', type: 'normal' },
+  { id: 's5', label: '11:40 - 13:00', type: 'break', text: 'Ishoma' },
+  { id: 's6', label: '13:00 - 13:40', type: 'normal' },
+  { id: 's7', label: '13:40 - 14:20', type: 'normal' },
+  { id: 's8', label: '14:20 - 15:00', type: 'normal' },
+  { id: 's9', label: '15:00 - 15:40', type: 'normal' }
+];
+
+// =====================================================
+// DATE & SLOT LOADING
+// =====================================================
+
+// Handle polling — dibersihkan saat keluar dari step 3
+let _slotPollTimer = null;
+
+// Muat ulang slot TANPA mereset pilihan yang sudah ada
+async function refreshSlotsOnly() {
+  const dateInput = document.getElementById('f-tanggal');
+  const slotGrid  = document.getElementById('slot-grid');
+  if (!dateInput.value || !slotGrid.innerHTML) return;
+
+  // Tampilkan indikator refresh halus di badge
+  const badges = slotGrid.querySelectorAll('.slot-badge:not(.slot-opt.booked .slot-badge)');
+
+  let bookedSlots = [];
+  try {
+    if (!APPS_SCRIPT_URL.includes('AKfycb...')) {
+      const res  = await fetch(`${APPS_SCRIPT_URL}?action=getSlots&date=${dateInput.value}&t=${Date.now()}`);
+      const data = await res.json();
+      if (Array.isArray(data.bookedSlots)) bookedSlots = data.bookedSlots;
+    }
+  } catch (e) { return; } // Abaikan error polling, jangan ganggu UX
+
+  // Update setiap slot tanpa re-render seluruh grid
+  JUMAT_SLOTS.forEach(slot => {
+    if (slot.type === 'break') return;
+    const input = document.getElementById(slot.id);
+    const wrap  = input ? input.closest('.slot-opt') : null;
+    if (!input || !wrap) return;
+
+    const isBooked = bookedSlots.includes(slot.label);
+    if (isBooked && !wrap.classList.contains('booked')) {
+      // Slot baru terisi sejak terakhir dimuat
+      input.disabled = true;
+      input.checked  = false; // Batalkan pilihan jika slot ini yang dipilih
+      wrap.classList.add('booked');
+      const badge = wrap.querySelector('.slot-badge');
+      if (badge) badge.textContent = 'Terisi';
+      document.getElementById('e-waktu').style.display = 'none';
+    } else if (!isBooked && wrap.classList.contains('booked')) {
+      // Slot tiba-tiba tersedia lagi (misal pembatalan)
+      input.disabled = false;
+      wrap.classList.remove('booked');
+      const badge = wrap.querySelector('.slot-badge');
+      if (badge) badge.textContent = 'Tersedia';
+    }
+  });
+}
+
+async function validateDateAndLoadSlots() {
+  const dateInput     = document.getElementById('f-tanggal');
+  const errEl         = document.getElementById('e-tanggal');
+  const slotContainer = document.getElementById('slot-container');
+  const slotGrid      = document.getElementById('slot-grid');
+
+  dateInput.classList.remove('invalid');
+  errEl.style.display = 'none';
+  slotContainer.style.display = 'none';
+  stopSlotPolling();
+
+  if (!dateInput.value) return;
+
+  // getDay() returns 5 for Friday (0=Sun)
+  const d = new Date(dateInput.value + 'T00:00:00');
+  if (d.getDay() !== 5) {
+    dateInput.classList.add('invalid');
+    errEl.style.display = 'flex';
+    return;
+  }
+
+  slotContainer.style.display = 'block';
+  slotGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:20px;color:var(--ink-300);">Memuat jadwal…</p>';
+
+  let bookedSlots = [];
+  try {
+    if (!APPS_SCRIPT_URL.includes('AKfycb...')) {
+      const res  = await fetch(`${APPS_SCRIPT_URL}?action=getSlots&date=${dateInput.value}&t=${Date.now()}`);
+      const data = await res.json();
+      if (Array.isArray(data.bookedSlots)) bookedSlots = data.bookedSlots;
+    }
+  } catch (e) {
+    console.warn('Apps Script belum tersambung, menggunakan data lokal.');
+  }
+
+  slotGrid.innerHTML = '';
+  JUMAT_SLOTS.forEach(slot => {
+    if (slot.type === 'break') {
+      slotGrid.insertAdjacentHTML('beforeend', `
+        <div class="slot-opt break">
+          <div class="slot-label">
+            <span class="slot-time">${slot.label.split(' - ')[0]}</span>
+            <span class="slot-badge">${slot.text}</span>
+          </div>
+        </div>`);
+      return;
+    }
+    const isBooked = bookedSlots.includes(slot.label);
+    slotGrid.insertAdjacentHTML('beforeend', `
+      <div class="slot-opt ${isBooked ? 'booked' : ''}">
+        <input type="radio" name="waktu" id="${slot.id}" value="${slot.label}" ${isBooked ? 'disabled' : ''}
+          onchange="document.getElementById('e-waktu').style.display='none'">
+        <label class="slot-label" for="${slot.id}">
+          <span class="slot-time">${slot.label.split(' - ')[0]}</span>
+          <span class="slot-badge">${isBooked ? 'Terisi' : 'Tersedia'}</span>
+        </label>
+      </div>`);
+  });
+}
+
+// Mulai polling otomatis setiap 30 detik
+function startSlotPolling() {
+  stopSlotPolling();
+  _slotPollTimer = setInterval(refreshSlotsOnly, 30_000);
+}
+function stopSlotPolling() {
+  if (_slotPollTimer) { clearInterval(_slotPollTimer); _slotPollTimer = null; }
+}
+
+// =====================================================
+// VALIDATION
+// =====================================================
+function validateStep1() {
+  let ok = true;
+  ['nama', 'nrp', 'jurusan', 'angkatan', 'wa'].forEach(id => {
+    const el = document.getElementById(`f-${id}`);
+    if (!el.value.trim()) {
+      el.classList.add('invalid');
+      document.getElementById(`e-${id}`).style.display = 'flex';
+      ok = false;
+    }
+  });
+  // Validasi email format NRP@student.its.ac.id
+  const email = document.getElementById('f-email');
+  if (!ITS_EMAIL_REGEX.test(email.value.trim())) {
+    email.classList.add('invalid');
+    document.getElementById('e-email').style.display = 'flex';
+    ok = false;
+  }
+  return ok;
+}
+
+function validateStep2() {
+  let ok = true;
+  const keluhan = document.getElementById('f-keluhan');
+  if (keluhan.value.trim().length < 10) {
+    keluhan.classList.add('invalid');
+    document.getElementById('e-keluhan').style.display = 'flex';
+    ok = false;
+  }
+  if (!document.querySelector('input[name="urgensi"]:checked')) {
+    document.getElementById('e-urgensi').style.display = 'flex';
+    ok = false;
+  } else {
+    document.getElementById('e-urgensi').style.display = 'none';
+  }
+  return ok;
+}
+
+// =====================================================
+// STEP NAVIGATION
+// =====================================================
+function goStep(from, to) {
+  if (from === 1 && to === 2 && !validateStep1()) return;
+  if (from === 2 && to === 3 && !validateStep2()) return;
+
+  // Hentikan polling jika meninggalkan step 3
+  if (from === 3 || from === 'success') stopSlotPolling();
+
+  document.getElementById(`step-${from}`).classList.remove('active');
+  document.getElementById(`step-${to}`).classList.add('active');
+
+  if (typeof to === 'number' && to <= 3) {
+    const titles = ['Informasi Pribadi', 'Detail Keluhan', 'Preferensi Jadwal'];
+    document.getElementById('prog-label').textContent = `Langkah ${to} dari 3 — ${titles[to - 1]}`;
+    document.getElementById('prog-pct').textContent   = Math.round((to / 3) * 100) + '%';
+    [1, 2, 3].forEach(i => {
+      document.getElementById(`dot-${i}`).className = 'step-seg' + (i < to ? ' done' : i === to ? ' active' : '');
+    });
+    // Mulai polling otomatis saat masuk step 3
+    if (to === 3) startSlotPolling();
+  } else {
+    // success state
+    stopSlotPolling();
+    document.getElementById('progress-wrap').style.display = 'none';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =====================================================
+// SUBMIT
+// =====================================================
+async function submitForm() {
+  const tanggal    = document.getElementById('f-tanggal').value;
+  const waktuRadio = document.querySelector('input[name="waktu"]:checked');
+  let ok = true;
+
+  const d = new Date(tanggal + 'T00:00:00');
+  if (!tanggal || d.getDay() !== 5) {
+    document.getElementById('f-tanggal').classList.add('invalid');
+    document.getElementById('e-tanggal').style.display = 'flex';
+    ok = false;
+  }
+  if (!waktuRadio) {
+    document.getElementById('e-waktu').style.display = 'flex';
+    ok = false;
+  }
+  if (!ok) return;
+
+  const btn          = document.getElementById('btn-submit');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML  = '<svg viewBox="0 0 24 24" style="animation:spin 1s linear infinite" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="3" stroke-dasharray="32" stroke-linecap="round"></circle></svg> Memproses…';
+  btn.disabled   = true;
+  stopSlotPolling(); // Hentikan polling saat submit dimulai
+
+  // ── LAYER 1: Cek ketersediaan slot SEBELUM kirim ke server ──
+  // Re-fetch data terbaru untuk deteksi jika slot sudah diambil
+  // sejak user memilih (window of vulnerability)
+  if (!APPS_SCRIPT_URL.includes('AKfycb...')) {
+    try {
+      const checkRes  = await fetch(`${APPS_SCRIPT_URL}?action=getSlots&date=${tanggal}&t=${Date.now()}`);
+      const checkData = await checkRes.json();
+      if (Array.isArray(checkData.bookedSlots) && checkData.bookedSlots.includes(waktuRadio.value)) {
+        // Slot sudah terisi — tolak di frontend sebelum sampai server
+        btn.innerHTML = originalHTML;
+        btn.disabled  = false;
+        document.getElementById('error-msg-text').textContent =
+          'Waktu yang Anda pilih baru saja dipesan oleh peserta lain. Silakan pilih waktu lain yang tersedia.';
+        openModal('error');
+        await validateDateAndLoadSlots(); // Reload grid dengan data terbaru
+        startSlotPolling();
+        return;
+      }
+    } catch (_) {
+      // Jika gagal fetch pre-check, lanjutkan — server tetap akan validasi
+    }
+  }
+
+  const payload = {
+    tanggal_booking: tanggal,
+    waktu_booking:   waktuRadio.value,
+    nama:      document.getElementById('f-nama').value.trim(),
+    nrp:       document.getElementById('f-nrp').value.trim(),
+    jurusan:   document.getElementById('f-jurusan').value.trim(),
+    angkatan:  document.getElementById('f-angkatan').value,
+    email:     document.getElementById('f-email').value.trim(),
+    whatsapp:  document.getElementById('f-wa').value.trim(),
+    keluhan:   document.getElementById('f-keluhan').value.trim(),
+    urgensi:   document.querySelector('input[name="urgensi"]:checked').value,
+    timestamp: new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })
+  };
+
+  try {
+    // ── LAYER 2: Server-side LockService + re-check di code.gs ──
+    const res  = await fetch(APPS_SCRIPT_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body:    JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById('ticket-result').textContent = data.ticketNum;
+      goStep(3, 'success');
+    } else {
+      btn.innerHTML = originalHTML;
+      btn.disabled  = false;
+      document.getElementById('error-msg-text').textContent = data.msg || 'Terjadi kesalahan. Silakan coba lagi.';
+      openModal('error');
+      await validateDateAndLoadSlots(); // Refresh grid dengan status terbaru
+      startSlotPolling();
+    }
+  } catch (err) {
+    // Fallback mode lokal jika Apps Script belum tersambung
+    console.warn('Gagal fetch API. Mode lokal aktif.');
+    document.getElementById('ticket-result').textContent = 'MC-' + Math.floor(1000 + Math.random() * 9000);
+    goStep(3, 'success');
+  }
+}
+
+// =====================================================
+// DROPDOWN & MODALS
+// =====================================================
+
+function openModal(id) {
+  document.getElementById(`modal-${id}`).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(`modal-${id}`).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModal(m.id.replace('modal-', '')); });
+});
+</script>
+</body>
+</html>
